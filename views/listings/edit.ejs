@@ -45,6 +45,19 @@
             <label for="country" class="form-label">Country</label>
         <input name="listing[country]" value="<%=listing.country%>" type="text" class="form-control" required/>
         <div class="valid-feedback">Country name should be valid</div>
+        
+        <div class="mb-3 mt-3">
+  <label for="category" class="form-label">Category</label>
+  <select name="listing[category]" id="category" class="form-select">
+    <% ["Trending","Rooms","Iconic Cities","Mountain","Castles","Camping","Farms","Domes"].forEach(function(c){ %>
+      <option value="<%= c %>" <%= listing.category === c ? "selected" : "" %>><%= c %></option>
+    <% }) %>
+  </select>
+</div>
+
+
+
+
         <br/></br>
         <button class="btn btn-dark edit-btn mt-3">Edit</button>
     </form>

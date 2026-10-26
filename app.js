@@ -26,6 +26,9 @@ const User=require("./models/user.js");
 const { register } = require("module");
 const userRouter=require("./routes/user.js");
 const { isLoggedIn, isReviewAuthor } = require("./middleware.js");
+const wishlistRouter=require("./routes/wishlist.js");
+const bookingRouter=require("./routes/booking.js");
+const dashboardRouter=require("./routes/dashboard.js");
 
 
 const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
@@ -89,6 +92,14 @@ app.use((req,res,next)=>{
     res.locals.currUser=req.user;
     next();
 });
+app.use (async(req,res,next)=>{
+  res.locals.wishlistIds = [];
+  if (req.user) {
+    const u = await User.findById(req.user._id).select("wishlist");
+    res.locals.wishlistIds = u.wishlist.map((w) => w.toString());
+  }
+  next();
+});
 
 //app.get("/demouser", async(req,res)=>{
    // let fakeUser=new User({
@@ -115,21 +126,20 @@ const validateReview=(req,res,next)=>{
 };
 
 app.use("/listings",listingRouter);
+app.use("/dashboard",dashboardRouter);
 app.use("/", userRouter);
 
 //Reviews
 //Post Review Route
-app.post("/listings/:id/reviews", isLoggedIn,validateReview,wrapAsync(async(req,res)=>{
-   let listing = await Listing.findById(req.params.id);
-   let newReview=new Review(req.body.review);
-    newReview.author=req.user._id;
-    console.log(newReview);
-   listing.reviews.push(newReview);
-   await newReview.save();
-   await listing.save();
-   req.flash("success", "New Review Created !");
-   res.redirect(`/listings/${listing._id}`);
-
+     app.post("/listings/:id/reviews", isLoggedIn, validateReview, wrapAsync(async (req, res) => {
+    let listing = await Listing.findById(req.params.id);
+    let newReview = new Review(req.body.review);
+    newReview.author = req.user._id;
+    listing.reviews.push(newReview);
+    await newReview.save();
+    await listing.save();
+    req.flash("success", "New Review Created !");
+    res.redirect(`/listings/${listing._id}`);
 }));
 
 //Delete Review Route
@@ -169,7 +179,8 @@ app.delete("/listings/:id/reviews/:reviewId",isLoggedIn,isReviewAuthor,wrapAsync
 
 
 
-
+app.use("/",wishlistRouter);
+app.use("/",bookingRouter);
 app.all("/*splat",(req,res,next)=>{
     next(new ExpressError(404,"page Not found !"));
 

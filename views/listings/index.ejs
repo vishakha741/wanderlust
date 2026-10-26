@@ -3,51 +3,67 @@
     <!--<h3 class="mt-4">All Listings</h3>-->
 
 <div id ="filters">
+    <a href="/listings?category=Trending"style="text-decoration:none; color:inherit;">
     <div class="filters">
        <div><i class="fa-solid fa-fire"></i></div>
       <p>Trending</p>
     </div>
-
+    </a>
+<a href="/listings?category=Rooms" style="text-decoration:none ; color:inherit;">
     <div class = "filters">
         <div><i class="fa-sharp fa-solid fa-bed"></i></div>
         <p>Rooms</p>
     </div>
-
+</a>
+<a href="/listings?category=Iconic Cities" style="text-decoration:none ; color:inherit;">
 
 <div class="filters">
     <div><i class="fa-solid fa-mountain-city"></i>
 </div>
-    <p>Tconic Cities</p>
+    <p>Iconic Cities</p>
 </div>
+</a>
+<a href="/listings?category=Mountain" style="text-decoration:none ; color:inherit;">
 
 <div class="filters">
     <div><i class="fa-solid fa-mountain"></i>
 </div>
     <p>Mountain</p>
 </div>
+</a>
+<a href="/listings?category=Castles" style="text-decoration:none ; color:inherit;">
+
 <div class="filters">
     <div><i class="fa-brands fa-fort-awesome"></i>
 </div>
     <p>Castles</p>
 </div>
+</a>
+<a href="/listings?category=Camping" style="text-decoration:none ; color:inherit;">
 
 <div class="filters">
     <div><i class="fa-sharp fa-solid fa-campground"></i>
 </div>
-    <p>Caming</p>
+    <p>Camping</p>
 </div>
+</a>
+<a href="/listings?category=Farms" style="text-decoration:none ; color:inherit;">
 
 <div class="filters">
     <div><i class="fa-solid fa-tractor"></i>
 </div>
     <p>Farms</p>
 </div>
+</a>
+<a href="/listings?category=Domes" style="text-decoration:none ; color:inherit;">
+
 <div class="filters">
         <div><i class="fa-solid fa-landmark-dome"></i>
 </div>
 
     <p>Domes</p>
 </div>
+</a>
 
 
 
@@ -64,7 +80,7 @@
     <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
         <% for(let listing of allListings) { %>
             <!-- Single Card Wrapper Column -->
-            <div class="col mb-4">
+            <div class="col mb-4 position-relative">
                 <a href="/listings/<%= listing._id %>" class="text-decoration-none text-dark">
                     <div class="card h-100 border-0 shadow-sm" style="border-radius: 1rem; overflow: hidden;">
                         <!-- Image with Fixed Height & Aspect Ratio -->
@@ -76,31 +92,52 @@
                                 <strong><%= listing.title %></strong>
                             </p>
                             <p class="card-text text-secondary">
-                                &#8377; <%= listing.price.toLocaleString("en-IN") %> / night
+                                &#8377; <span class="price" data-price="<%=listing.price %>"><%= listing.price.toLocaleString("en-IN") %></span>/ night
                                 
-                                <i class ="tax-info">&nbsp; &nbsp; +18% GST</i>
+                                <i class ="tax-info" style="display: none;">&nbsp; &nbsp; +18% GST</i>
                             </p>
                         </div>
                     </div>
                 </a>
-            </div>
-        <% } %>
+
+
+            <form method="POST" action="/listings/<%= listing._id %>/wishlist" class="heart-btn">
+              <button type="submit" class="btn p-0 border-0 bg-transparent">
+                <% if (wishlistIds.includes(listing._id.toString())) { %>
+                  <i class="fa-solid fa-heart text-danger fs-4"></i>
+                <% } else { %>
+                  <i class="fa-regular fa-heart text-white fs-4"></i>
+                <% } %>
+              </button>
+            </form>
+        </div>
+    <% } %>
     </div>
     
-        <script>
-  let taxSwitch = document.getElementById("SwitchCheckDefault");
-  
-  taxSwitch.addEventListener("click", () => {
-    let taxInfo = document.getElementsByClassName("tax-info");
-    
-    for (let info of taxInfo) {
-      if (info.style.display === "none" || info.style.display === "") {
-        info.style.display = "inline";
-      } else {
-        info.style.display = "none";
-      }
+       <script>
+  (function () {
+    const toggle = document.getElementById("SwitchCheckDefault")
+      || document.querySelector(".form-check-input");
+
+    if (!toggle) {
+      console.log("Toggle nahi mila");
+      return;
     }
-  });
+
+    toggle.addEventListener("change", function () {
+      const on = toggle.checked;
+
+      document.querySelectorAll(".tax-info").forEach(function (el) {
+        el.style.display = on ? "inline" : "none";
+      });
+
+      document.querySelectorAll(".price").forEach(function (el) {
+        const price = Number(el.dataset.price);
+        const finalPrice = on ? Math.round(price * 1.18) : price;
+        el.textContent = finalPrice.toLocaleString("en-IN");
+      });
+    });
+  })();
 </script>
     
 

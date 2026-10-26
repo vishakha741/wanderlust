@@ -1,0 +1,20 @@
+<% layout("/layouts/boilerplate") %>
+
+<h3 class="mt-3 mb-4">Meri Bookings</h3>
+
+<% if (bookings.length === 0) { %>
+  <p>Abhi koi booking nahi hai.</p>
+<% } %>
+
+<% for (let b of bookings) { %>
+  <div class="card p-3 mb-3">
+    <h5><%= b.listing.title %></h5>
+    <p><%= b.checkIn.toDateString() %> to <%= b.checkOut.toDateString() %></p>
+    <p>Total: &#8377; <%= b.totalPrice.toLocaleString("en-IN") %> | Status: <%= b.status %></p>
+    <% if (b.status === "confirmed") { %>
+      <form method="POST" action="/bookings/<%= b._id %>/cancel">
+        <button class="btn btn-sm btn-outline-danger">Cancel</button>
+      </form>
+    <% } %>
+  </div>
+<% } %>

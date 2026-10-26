@@ -11,10 +11,39 @@ const geocodingClient = mbxGeocoding({ accessToken: mapToken});
 
 
 //index
-module.exports.index = async (req,res)=>{
- const allListings= await  Listing.find({});
- res.render("listings/index.ejs",{allListings});
+module.exports.index = async (req, res) => {
+  const { q ,category} = req.query;
+  let filter = {};
+
+  if (category){
+   filter.category=category;
+  }
+  if(q){
+    const safe = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(safe, "i");
+    filter.$or = [{ title: regex }, { location: regex }, { country: regex }] 
+  };
+  
+
+  const allListings = await Listing.find(filter);
+
+  if ((q ||category ) && allListings.length === 0) {
+    req.flash("error", "Koi listing nahi mili");
+    return res.redirect("/listings");
+  }
+  res.render("listings/index.ejs", { allListings });
 };
+
+
+
+
+
+
+
+
+
+
+
 
 //new
 module.exports.renderNewForm = (req,res)=>{  
@@ -35,7 +64,7 @@ module.exports.renderNewForm = (req,res)=>{
 .populate("owner");
    if(!listing){
     req.flash("error","Listing you requested for does not exist !");
-    res.redirect("/listings");
+    return res.redirect("/listings");
    }
    console.log(listing);
    res.render("listings/show.ejs",{listing});

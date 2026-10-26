@@ -26,12 +26,16 @@ const listingSchema=new Schema({
         type:Schema.Types.ObjectId,
         ref:"User",
     },
+    category:{
+        type:String,
+        enum:["Trending","Rooms","Iconic Cities","Mountain","Castles","Camping","Farms" ,"Domes"],
+    },
 
 
 geometry:{
     type:{
         type:String,
-        enum:['Point','point'],
+        enum:['Point'],
         required:true
     },
     coordinates:{
